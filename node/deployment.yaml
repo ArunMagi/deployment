@@ -1,32 +1,35 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: node-app
+  name: php-apache
 spec:
-  replicas: 1
   selector:
     matchLabels:
-      app: node-app
+      run: php-apache
   template:
     metadata:
       labels:
-        app: node-app
+        run: php-apache
     spec:
       containers:
-      - name: node-app
-        image: arunmagi/node-app
+      - name: php-apache
+        image: registry.k8s.io/hpa-example
         ports:
-        - containerPort: 9000
-
+        - containerPort: 80
+        resources:
+          limits:
+            cpu: 500m
+          requests:
+            cpu: 200m
+---
 apiVersion: v1
 kind: Service
 metadata:
-  name: node-app
+  name: php-apache
+  labels:
+    run: php-apache
 spec:
-  selector:
-    app: node-app
   ports:
-  - protocol: TCP
-    port: 9000
-    targetPort: 9000
-  type: NodePort
+  - port: 80
+  selector:
+    run: php-apache
